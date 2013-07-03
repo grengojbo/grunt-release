@@ -44,6 +44,11 @@ or
 grunt release:patch
 ```
 
+**Comments:**
+```shell
+grunt release:"comments text"
+```
+
 **Minor Release:**
 ```shell
 grunt release:minor

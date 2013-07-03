@@ -23,6 +23,7 @@ module.exports = function(grunt){
       npm : true
     });
 
+    var setType = type || 'patch';
     var tagName = grunt.config.getRaw('release.options.tagName') || '<%= version %>';
     var commitMessage = grunt.config.getRaw('release.options.commitMessage') || 'release <%= version %>';
     var tagMessage = grunt.config.getRaw('release.options.tagMessage') || 'version <%= version %>';
@@ -40,11 +41,17 @@ module.exports = function(grunt){
     if (options.tag) tag(config);
     if (options.push) push();
     if (options.pushTags) pushTags(config);
-    if (options.npm) publish(config);
+    // if (options.npm) publish(config);
 
     function setup(file, type){
       var pkg = grunt.file.readJSON(file);
       var newVersion = pkg.version;
+      if (!(setType=='minor') && !(setType=='major')) {
+        commitMessage = setType;
+        options.tag = false;
+        options.pushTags = false;
+        type = 'patch';
+      };
       if (options.bump) {
         newVersion = semver.inc(pkg.version, type || 'patch');
       }
@@ -52,12 +59,12 @@ module.exports = function(grunt){
     }
 
     function add(config){
-      run('git add ' + config.file);
+      run('git add .');
     }
 
     function commit(config){
       var message = grunt.template.process(commitMessage, templateOptions);
-      run('git commit '+ config.file +' -m "'+ message +'"', config.file + ' committed');
+      run('git commit -a -m "'+ message +'"', message + ' committed');
     }
 
     function tag(config){
